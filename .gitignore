@@ -1,0 +1,23 @@
+# Haskell
+dist/
+dist-newstyle/
+cabal.project.local
+.stack-work/
+.stack-work-impl/
+.hie/
+.hlint.yaml
+.cabal-sandbox/
+cabal.sandbox.config
+*.hi
+*.o
+*.hi-boot
+*.o-boot
+*.dyn_hi
+*.dyn_o
+*.prof
+*.aux
+*.hp
+*.eventlog
+*.tix
+*.mix
+*.hpc
