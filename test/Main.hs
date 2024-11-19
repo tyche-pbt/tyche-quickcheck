@@ -3,7 +3,7 @@
 module Main where
 
 import Test.QuickCheck
-import Test.Tyche (labelCategory, labelNumber)
+import Test.Tyche (labelCategory, labelContinuous, labelNumber, labelPair)
 import qualified Test.Tyche as Tyche
 
 data Tree = Leaf | Node Tree Int Tree
@@ -27,6 +27,10 @@ insert x (Node l y r)
 size :: Tree -> Int
 size Leaf = 0
 size (Node l _ r) = 1 + size l + size r
+
+depth :: Tree -> Int
+depth Leaf = 0
+depth (Node l _ r) = 1 + max (depth l) (depth r)
 
 member :: Int -> Tree -> Bool
 member _ Leaf = False
@@ -72,14 +76,16 @@ prop_insertValid =
       label ("size:" ++ show (size t)) $
         isBST (insert x t)
 
-prop_insertPost :: Int -> Tree -> Property
-prop_insertPost x t =
+prop_insertPost :: (Double, Double) -> Int -> Tree -> Property
+prop_insertPost (d1, d2) x t =
   Tyche.visualize "prop_insert_post" $
     labelNumber "size" (size t) $
-      labelNumber "value" x $
-        labelCategory "isBST" (show (isBST t)) $
-          isBST t
-            ==> member x (insert x t)
+      labelContinuous "d" d1 $
+        labelPair "p" ("d1", d1) ("d2", d2) $
+          labelNumber "value" x $
+            labelCategory "isBST" (show (isBST t)) $
+              isBST t ==>
+                member x (insert x t)
 
 return []
 

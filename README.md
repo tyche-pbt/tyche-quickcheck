@@ -23,12 +23,14 @@ and then add `tyche` to your `build-depends` as usual:
 
 To use this wrapper, simply follow the recipe here:
 ```haskell
-prop_insertPost :: Int -> Tree -> Property
-prop_insertPost x t =
+prop_insertPost :: (Double, Double) -> Int -> Tree -> Property
+prop_insertPost (d1, d2) x t =
   Tyche.visualize "prop_insert_post" $
-    Tyche.labelNumber "size" (size t) $
-    Tyche.labelNumber "value" x $
-    Tyche.labelCategory "isBST" (show (isBST t)) $
+    labelNumber "size" (size t) $
+    labelContinuous "d" d1 $
+    labelPair "p" ("d1", d1) ("d2", d2) $
+    labelNumber "value" x $
+    labelCategory "isBST" (show (isBST t)) $
       isBST t ==> member x (insert x t)
 ```
 wrap your property with `Tyche.visualize`, adding a string to name it, and then within the property

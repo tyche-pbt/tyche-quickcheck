@@ -1,7 +1,15 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Test.Tyche (visualize, visualizeResult, labelNumber, labelCategory) where
+module Test.Tyche
+  ( visualize,
+    visualizeResult,
+    labelNumber,
+    labelContinuous,
+    labelCategory,
+    labelPair,
+  )
+where
 
 import Data.Aeson
   ( Options (fieldLabelModifier, sumEncoding),
@@ -27,7 +35,9 @@ import Text.Read (readMaybe)
 
 data FeatureData
   = IntData Int
+  | DoubleData Double
   | StringData String
+  | PairData ((String, Double), (String, Double))
   deriving (Generic, Show)
 
 instance ToJSON FeatureData where
@@ -100,8 +110,14 @@ visualizeResult propName res = do
 labelNumber :: forall prop. (Testable prop) => String -> Int -> prop -> Property
 labelNumber s v = label (s ++ ":" ++ show v)
 
+labelContinuous :: forall prop. (Testable prop) => String -> Double -> prop -> Property
+labelContinuous s v = label (s ++ ":" ++ show v)
+
 labelCategory :: forall prop. (Testable prop) => String -> String -> prop -> Property
 labelCategory s v = label (s ++ ":" ++ v)
+
+labelPair :: forall prop. (Testable prop) => String -> (String, Double) -> (String, Double) -> prop -> Property
+labelPair s p q = label (s ++ ":" ++ show (p, q))
 
 visualize :: (Testable prop) => String -> prop -> Property
 visualize propName p = ioProperty $ do
@@ -134,7 +150,12 @@ visualize propName p = ioProperty $ do
       | ':' `elem` l =
           (takeWhile (/= ':') l, parseData (drop 1 (dropWhile (/= ':') l)))
       where
-        parseData s = case readMaybe s of
-          Just n -> IntData n
-          Nothing -> StringData s
+        parseData s =
+          case readMaybe s of
+            Just n -> DoubleData n
+            Nothing -> case readMaybe s of
+              Just n -> IntData n
+              Nothing -> case readMaybe s of
+                Just n -> PairData n
+                Nothing -> StringData s
     parseLabel l = (l, StringData "")
