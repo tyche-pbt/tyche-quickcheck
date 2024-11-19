@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE RankNTypes #-}
 
-module Test.Tyche (visualize, visualizeResult) where
+module Test.Tyche (visualize, visualizeResult, labelNumber, labelCategory) where
 
 import Data.Aeson
   ( Options (fieldLabelModifier, sumEncoding),
@@ -19,7 +20,7 @@ import GHC.Generics (Generic)
 import GHC.IO (unsafePerformIO)
 import GHC.IORef (newIORef, writeIORef)
 import System.Directory (createDirectoryIfMissing)
-import Test.QuickCheck (Property, Testable, ioProperty)
+import Test.QuickCheck (Property, Testable, ioProperty, label)
 import qualified Test.QuickCheck as QuickCheck
 import Test.QuickCheck.Property (Callback (PostTest), CallbackKind (NotCounterexample), Result (labels, ok, reason, testCase), callback)
 import Text.Read (readMaybe)
@@ -95,6 +96,12 @@ visualizeResult propName res = do
         _info_title = "QuickCheck Result",
         _info_content = show res
       }
+
+labelNumber :: forall prop. (Testable prop) => String -> Int -> prop -> Property
+labelNumber s v = label (s ++ ":" ++ show v)
+
+labelCategory :: forall prop. (Testable prop) => String -> String -> prop -> Property
+labelCategory s v = label (s ++ ":" ++ v)
 
 visualize :: (Testable prop) => String -> prop -> Property
 visualize propName p = ioProperty $ do

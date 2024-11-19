@@ -68,8 +68,7 @@ library
     -- other-extensions:
 
     -- Other library packages from which modules are imported.
-    build-depends:    base ^>=4.16.4.0,
-                      websockets,
+    build-depends:    base >= 4.16 && < 4.18,
                       aeson,
                       containers,
                       QuickCheck,
@@ -82,3 +81,11 @@ library
 
     -- Base language which the package is written in.
     default-language: Haskell2010
+
+Test-Suite test-tyche
+    type:           exitcode-stdio-1.0
+    hs-source-dirs: test
+    main-is:        Main.hs
+    build-depends:  base ^>=4.17,
+                    tyche,
+                    QuickCheck
